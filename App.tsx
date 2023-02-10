@@ -16,6 +16,9 @@ import { NavigationContainer } from '@react-navigation/native'
 import { AppRoutes } from './src/routes/app.routes'
 import { SignIn } from './src/screens/SignIn/index'
 
+import { AuthContext } from './src/Utils/authContext'
+import { AuthProvider } from './src/hooks/auth'
+
 SplashScreen.preventAutoHideAsync()
 
 export default function App() {
@@ -32,7 +35,9 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <NavigationContainer>
         {/* <AppRoutes /> */}
-        <SignIn />
+        <AuthProvider>
+          <SignIn />
+        </AuthProvider>
       </NavigationContainer>
     </ThemeProvider>
   )
