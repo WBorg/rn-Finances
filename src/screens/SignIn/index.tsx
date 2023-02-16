@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react'
-import { Platform } from 'react-native'
+import { Alert, Platform } from 'react-native'
 import {
   Container,
   Header,
@@ -28,8 +28,16 @@ import Apple from '../../assets/svg/apple.svg'
 import { SignInSocialButton } from '../../components/SignInSocialButton'
 
 export function SignIn() {
-  const data = useAuth()
-  console.log(data)
+  const { signInWithGoogle } = useAuth()
+
+  async function handleSignInWithGoogle() {
+    try {
+      await signInWithGoogle()
+    } catch (error) {
+      console.log(error)
+      Alert.alert('não foi possível concectar a conta google')
+    }
+  }
   // const [isLoading, setIsLoading] = useState(false);
   // const { signInWithGoogle, signInWithApple } = useAuth();
 
@@ -66,7 +74,7 @@ export function SignIn() {
           <SignInSocialButton
             title="Entrar com Google"
             svg={Google}
-            onPress={() => {}}
+            onPress={handleSignInWithGoogle}
           />
 
           {Platform.OS === 'ios' && (
