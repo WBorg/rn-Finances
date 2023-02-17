@@ -10,6 +10,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import * as AuthSession from 'expo-auth-session'
 
+const { CLIENT_ID } = process.env
+const { REDIRECT_URI } = process.env
+
 interface AuthProviderProps {
   children: ReactNode
 }
