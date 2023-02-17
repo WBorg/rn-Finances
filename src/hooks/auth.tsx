@@ -1,13 +1,11 @@
 import React, {
   createContext,
-  useContext,
   ReactNode,
-  useState,
-  useEffect
+  useContext,
+  useEffect,
+  useState
 } from 'react'
-import { SignIn } from '../screens/SignIn'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-
 import * as AuthSession from 'expo-auth-session'
 
 const { CLIENT_ID } = process.env
@@ -45,41 +43,35 @@ function AuthProvider({ children }: AuthProviderProps) {
 
   async function signInWithGoogle() {
     try {
-      const CLIENT_ID =
-        '612765459901-octlun5tmufakmm0iu4g031icat063mg.apps.googleusercontent.com'
-      const REDIRECT_URI = 'https://auth.expo.io/@wilcoy/goFinances'
-      const RESPONSE_TYPE = 'token'
-      const SCOPE = encodeURI('profile email')
+      const response_type = 'token'
+      const scope = encodeURI('profile email')
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${response_type}&scope=${scope}`
+      const { type, params } = (await AuthSession.startAsync({
+        authUrl
+      })) as AuthorizationResponse
 
-      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}&scope=${SCOPE}`
+      // const response = await AuthSession.startAsync({ authUrl });
 
-      const response = await AuthSession.startAsync({ authUrl })
-      console.log(response)
-      console.log(response.type)
-      //console.log(params.access_token)
+      // console.log(response);
 
-      //----------------------------------------------------------------------------Auth
-      // const { type, params } = (await AuthSession.startAsync({
-      //   authUrl
-      // })) as AuthorizationResponse
+      // console.log(response.type);
+      // console.log(response.params.access_token);
 
-      // if (type === 'success') {
-      //   const response = await fetch(
-      //     `https://accounts.google.com/o/oauth2/v1/userinfo?alt=json&access_token=${params.access_token}`
-      //   )
-      //   const userInfo = await response.json()
-      //   console.log(userInfo)
+      if (type === 'success') {
+        const response = await fetch(
+          `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${params.access_token}`
+        )
 
-      //   setUser({
-      //     id: userInfo.id,
-      //     email: userInfo.email,
-      //     name: userInfo.name,
-      //     photo: userInfo.photo
-      //   })
-      // }
+        const userInfo = await response.json()
+        console.log(userInfo)
+        setUser({
+          id: userInfo.id,
+          email: userInfo.email,
+          name: userInfo.name,
+          photo: userInfo.picture
+        })
+      }
 
-      // console.log(response)
-      //--------------------------------------------------------------------------------------
       await AsyncStorage.setItem('@gofinances:user', JSON.stringify(user))
     } catch (error) {
       throw new Error(error)
@@ -92,15 +84,17 @@ function AuthProvider({ children }: AuthProviderProps) {
   }
 
   useEffect(() => {
-    async function loadStorageDate(): Promise<void> {
+    async function loadStoregeDate(): Promise<void> {
       const data = await AsyncStorage.getItem('@gofinances:user')
       if (data) {
         const userLogged = JSON.parse(data) as User
         setUser(userLogged)
       }
+      setLoading(false)
     }
-    loadStorageDate()
+    loadStoregeDate()
   }, [setUser, setLoading])
+
   return (
     <AuthContext.Provider value={{ user, signInWithGoogle, signOut }}>
       {children}
@@ -112,4 +106,5 @@ function useAuth() {
   const context = useContext(AuthContext)
   return context
 }
+
 export { AuthProvider, useAuth }
