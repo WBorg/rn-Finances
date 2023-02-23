@@ -172,12 +172,12 @@ export function Dashboard() {
               <UserInfo>
                 <Photo
                   source={{
-                    uri: 'https://avatars.githubusercontent.com/u/37640000?v=4'
+                    uri: `${user.photo}`
                   }}
                 />
                 <User>
                   <UserGreething>Olá,</UserGreething>
-                  <UserName>Fernando</UserName>
+                  <UserName>{user.name}</UserName>
                 </User>
               </UserInfo>
               <LogoutButton onPress={signOut}>
